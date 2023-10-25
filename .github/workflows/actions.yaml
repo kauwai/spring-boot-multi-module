@@ -25,16 +25,16 @@ jobs:
 
     - name: Make HTTP Request with JavaScript
       run: |
+        cat << 'EOF' > script.js
         const http = require('@actions/http-client');
         const fs = require('fs');
         const httpClient = new http.HttpClient();
         async function patchArchitecture() {
           const scipFile = fs.readFileSync('index.scip');
-          const response = await httpClient.post(
-            `https://bela-api.jux.house/api/scip-request?secret=${{ secrets.SCIP_SECRET }}`,
-            scipFile
-          );
-
+          const response = await httpClient.post('https://bela-api.jux.house/api/scip-request?secret=', scipFile);
           const body = await response.readBody();
+          console.log(body);
         }
         patchArchitecture();
+        EOF
+        node script.js
