@@ -21,28 +21,22 @@ jobs:
         node-version: '14'
 
     - name: Install dependencies
-      run: npm install node-fetch
+      run: npm install axios
 
     - name: Make HTTP Request with JavaScript
       run: |
         cat << 'EOF' > script.js
-        import fetch from 'node-fetch';
-        import fs from 'fs/promises';
+        const axios = require('axios');
+        const fs = require('fs');
     
         async function patchArchitecture() {
           try {
             const scipFile = fs.readFileSync('index.scip');
-            const response = await fetch('https://bela-api.jux.house/api/scip-request?secret=${{ secrets.SCIP_SECRET }}', {
-              method: 'POST',
-              body: scipFile
-            });
-    
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-    
-            const body = await response.text();
+            const response = await axios.post('https://bela-api.jux.house/api/scip-request?secret=${{ secrets.SCIP_SECRET }}',
+              scipFile
+            );
 
+            console.log(response.data);
           } catch (error) {
             console.error(`An error occurred: ${error}`);
           }
