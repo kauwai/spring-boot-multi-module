@@ -15,34 +15,10 @@ jobs:
     - name: Create SCIP Java index
       run: docker run -v $(pwd):/sources --env JVM_VERSION=17 sourcegraph/scip-java:latest scip-java index
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
-
-    - name: Install dependencies
-      run: npm install axios
-
-    - name: Make HTTP Request with JavaScript
+    - name: Make HTTP Request with curl
       env:
         SCIP_SECRET: ${{ secrets.SCIP_SECRET }}
       run: |
-        cat << EOF > script.js
-        const axios = require('axios');
-        const scipSecret = process.env.SCIP_SECRET;
-        const fs = require('fs');
-    
-        async function patchArchitecture() {
-          try {
-            const scipFile = fs.readFileSync('index.scip');
-            const apiUrl = 'https://bela-api.jux.house/api/architecture-scip?source=spring-boot-multi-module&secret=' + scipSecret
-            const response = await axios.post(apiUrl, scipFile);
-
-            console.log(response.data);
-          } catch (error) {
-            console.error('An error occurred: ' + error);
-          }
-        }
-        patchArchitecture();
-        EOF
-        node script.js
+        curl -X POST "https://bela-api.jux.house/api/scip-request?secret=${SCIP_SECRET}" \
+             -H "Content-Type: application/octet-stream" \
+             --data-binary @index.scip
