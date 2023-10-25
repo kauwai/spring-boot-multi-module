@@ -35,7 +35,7 @@ jobs:
         async function patchArchitecture() {
           try {
             const scipFile = fs.readFileSync('index.scip');
-            const apiUrl = 'https://bela-api.jux.house/api/scip-request?secret=' + scipSecret
+            const apiUrl = 'https://bela-api.jux.house/api/architecture-scip?source=spring-boot-multi-module&secret=' + scipSecret
             const response = await axios.post(apiUrl, scipFile);
 
             console.log(response.data);
