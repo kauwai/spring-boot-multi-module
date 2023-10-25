@@ -21,19 +21,31 @@ jobs:
         node-version: '14'
 
     - name: Install dependencies
-      run: npm install @actions/http-client
+      run: npm install node-fetch
 
     - name: Make HTTP Request with JavaScript
       run: |
         cat << 'EOF' > script.js
-        const http = require('@actions/http-client');
+        const fetch = require('node-fetch');
         const fs = require('fs');
-        const httpClient = new http.HttpClient();
+    
         async function patchArchitecture() {
-          const scipFile = fs.readFileSync('index.scip');
-          const response = await httpClient.post('https://bela-api.jux.house/api/scip-request?secret=', scipFile);
-          const body = await response.readBody();
-          console.log(body);
+          try {
+            const scipFile = fs.readFileSync('index.scip');
+            const response = await fetch('https://bela-api.jux.house/api/scip-request?secret=${{ secrets.SCIP_SECRET }}', {
+              method: 'POST',
+              body: scipFile
+            });
+    
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
+            const body = await response.text();
+
+          } catch (error) {
+            console.error(`An error occurred: ${error}`);
+          }
         }
         patchArchitecture();
         EOF
