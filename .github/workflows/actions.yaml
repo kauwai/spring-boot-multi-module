@@ -29,12 +29,13 @@ jobs:
       run: |
         cat << EOF > script.js
         const axios = require('axios');
+        const scipSecret = process.env.SCIP_SECRET;
         const fs = require('fs');
     
         async function patchArchitecture() {
           try {
             const scipFile = fs.readFileSync('index.scip');
-            const response = await axios.post('https://bela-api.jux.house/api/scip-request?secret=${process.env.SCIP_SECRET}',
+            const response = await axios.post(`https://bela-api.jux.house/api/scip-request?secret=${scipSecret}`,
               scipFile
             );
 
