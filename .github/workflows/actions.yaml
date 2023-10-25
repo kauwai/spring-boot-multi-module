@@ -19,6 +19,6 @@ jobs:
       env:
         SCIP_SECRET: ${{ secrets.SCIP_SECRET }}
       run: |
-        curl -X POST "https://bela-api.jux.house/api/scip-request?secret=${SCIP_SECRET}" \
+        curl -X POST "https://bela-api.jux.house/api/architecture-scip?source=spring-boot-multi-module&secret=${SCIP_SECRET}" \
              -H "Content-Type: application/octet-stream" \
              --data-binary @index.scip
