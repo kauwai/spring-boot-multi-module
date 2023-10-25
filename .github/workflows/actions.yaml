@@ -26,8 +26,8 @@ jobs:
     - name: Make HTTP Request with JavaScript
       run: |
         cat << 'EOF' > script.js
-        const fetch = require('node-fetch');
-        const fs = require('fs');
+        import fetch from 'node-fetch';
+        import fs from 'fs/promises';
     
         async function patchArchitecture() {
           try {
