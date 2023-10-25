@@ -1,0 +1,40 @@
+name: BELA-SCIP Integration
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Create SCIP Java index
+      run: docker run -v $(pwd):/sources --env JVM_VERSION=17 sourcegraph/scip-java:latest scip-java index
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install @actions/http-client
+
+    - name: Make HTTP Request with JavaScript
+      run: |
+        const http = require('@actions/http-client');
+        const fs = require('fs');
+        const httpClient = new http.HttpClient();
+        async function patchArchitecture() {
+          const scipFile = fs.readFileSync('index.scip');
+          const response = await httpClient.post(
+            `https://bela-api.jux.house/api/scip-request?secret=${{ secrets.SCIP_SECRET }}`,
+            scipFile
+          );
+
+          const body = await response.readBody();
+        }
+        patchArchitecture();
